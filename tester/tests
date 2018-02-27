@@ -1,0 +1,305 @@
+[901]
+NAME="Nothing"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo ''
+[901-END]
+
+[902]
+NAME="Exec two command"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'ls /bin'
+  echo 'cat /etc/resolv.conf'
+[902-END]
+
+[903]
+NAME="Testing with /usr/bin PATH"
+SETUP="export TERM=xterm ; PATH='/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'pwd'
+[903-END]
+
+[904]
+NAME="Testing with /bin PATH"
+SETUP="export TERM=xterm ; PATH='/bin'"
+CLEAN=""
+TESTS=
+  echo 'pwd'
+[904-END]
+
+[905]
+NAME="run commands"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'cat /etc/resolv.conf'
+  sleep 0.5
+  echo 'ls -l /bin'
+  sleep 0.5
+  echo 'pwd'
+[905-END]
+
+[906]
+NAME="setenv and unsetenv"
+SETUP="/usr/bin/env > .lstenv ; while read varenv ; do unset $varenv ; done < <(/bin/cat .lstenv | /usr/bin/cut -f1 -d=) ; export PATH=/bin:/usr/bin ; export _=ls ; export LS_COLORS=RID ; export MYBG=4 ; export LVL=4 ; export NOTE=2"
+CLEAN="while read varenv ; do export "$varenv" 2>/dev/null ; done  < <(/bin/cat .lstenv) ; /bin/rm -f .lstenv"
+TESTS=
+  echo 'unsetenv PATH'
+  echo 'unsetenv _'
+  echo 'unsetenv LS_COLORS'
+[906-END]
+
+[907]
+NAME="builtin cd"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'cd ..'
+  echo 'ls -l'
+  echo 'cd /usr'
+  echo 'ls -l'
+[907-END]
+
+[908]
+NAME="many tab and space"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo -e "\t\t    ls\t     \t-l    \t\t  \t -a /usr   \t\t"
+[908-END]
+
+[909]
+NAME="Launch DivZero program with core dump"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo "./my_divzero"
+[909-END]
+
+[910]
+NAME="Launch SegFault program without core dump"
+SETUP="ulimit -c 0 ; export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo "./my_segfault"
+[910-END]
+
+[911]
+NAME="Testing simple pipe"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo "ls -l /bin | grep sh"
+[911-END]
+
+[912]
+NAME="A pipe with a builtin ?"
+SETUP="export VAR1=VALEUR1 ; OLDPATH=$PATH;"
+CLEAN="PATH=$OLDPATH"
+TESTS=
+  echo 'env | grep VAR1'
+  echo 'ls | cd /usr'
+  echo 'ls -l'
+  echo 'exit'
+[912-END]
+
+[913]
+NAME="A medium pipe"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'setenv | /bin/grep "PATH" | /usr/bin/wc | /bin/grep "." | /usr/bin/wc -l'
+  echo '/usr/bin/man tar | /bin/grep "." | /usr/bin/wc -l'
+  echo 'exit'
+[913-END]
+
+[914]
+NAME="Test ;"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'ls; cd ..; cd -; ls; cat Makefile'
+  echo 'echo test; echo toto; echo lol'
+  echo 'exit'
+[914-END]
+
+[915]
+NAME="Test ; with pipe"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+  echo 'ls; setenv | grep "PATH" | wc -c| grep "." | wc -l; echo toto'
+  echo 'echo toto; echo lol; cd ..; ls; man tar | grep "." | wc -l'
+  echo 'exit'
+[915-END]
+
+[916]
+NAME="Test ; with pipe and > and >>"
+SETUP="export TERM=xterm ;"
+CLEAN=""
+TESTS=
+  echo 'ls; setenv | grep "PATH" | wc -c | grep "." | wc -l; echo toto; echo toto > lol'
+  echo 'echo toto; echo lol; cd ..; ls; man tar | grep "." | wc -l; echo toto >> lol'
+  echo 'cat ../lol'
+  echo 'exit'
+[916-END]
+
+[917]
+NAME="Test ; with pipe > < >>"
+SETUP="export TERM=xterm ;"
+CLEAN=""
+TESTS=
+echo 'ls; setenv | grep "PATH" | wc -c | grep "." | wc -l; echo toto; echo toto > lol; /bin/grep . < main.c; echo lili > lol; echo toto >> lol'
+echo 'echo done'
+echo 'echo toto; echo lol; cd ..; ls; man tar | grep "." | wc -l; echo toto >> lol'
+echo 'cat lol && rm lol'
+echo 'exit'
+[917-END]
+
+[918]
+NAME="42sh example"
+SETUP="export TERM=xterm ; "
+CLEAN=""
+TESTS=
+echo 'cd ; </etc/hosts od -c | grep xx | wc -c >> /tmp/z -l ; cd - && echo "OK"'
+echo 'exit'
+[918-END]
+
+[919]
+NAME="42sh (True moulinette) Test 01 (&& and ||)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'ls /root && echo yes || echo no && echo test && echo lol'
+echo 'exit'
+[919-END]
+
+[920]
+NAME="42sh (True moulinette) Test 03 (<< EOF with PIPE >> < >)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo '<< toto cat > toto ; << EOF cat | sed s/toto/0/ > ma_note ; echo -n ma_note ; < ma_note cat'
+echo 'exit'
+[920-END]
+
+[921]
+NAME="42sh (True moulinette) Test 04 (&&)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'ls -l /dev && echo display$'
+echo 'exit'
+[921-END]
+
+[922]
+NAME="42sh (True moulinette) Test 05 (|| &&)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'ls -l /dev && echo displayOK || echo err_disp4$'
+echo 'exit'
+[922-END]
+
+[923]
+NAME="42sh (True moulinette) Test 06 (Which)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which ls pwd cat'
+echo 'exit'
+[923-END]
+
+[924]
+NAME="42sh (True moulinette) Test 07 (Which + built-in)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'which ls echo cat pwd'
+echo 'exit'
+[924-END]
+
+[925]
+NAME="42sh (True moulinette) Test 08 (Where)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where ls pwd cat'
+echo 'exit'
+[925-END]
+
+[926]
+NAME="42sh (True moulinette) Test 09 (Which)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'where ls echo cat pwd'
+echo 'exit'
+[926-END]
+
+[927]
+NAME="42sh (True moulinette) Test 10 (Repeat)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'repeat 10 ls'
+echo 'exit'
+[927-END]
+
+[928]
+NAME="42sh (True moulinette) Test 11 (Repeat with && )"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'repeat 10 ls && ls'
+echo 'exit'
+[928-END]
+
+[929]
+NAME="42sh (True moulinette) Test 12 (Repeat of Repeat with &&)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'repeat 10 repeat 10 ls && ls'
+echo 'exit'
+[929-END]
+
+[930]
+NAME="42sh (True moulinette) Test 12 (Repeat of Repeat with &&)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'repeat 10 repeat 10 ls && ls'
+echo 'exit'
+[930-END]
+
+[931]
+NAME="42sh Test 01 (Inhibitor "")"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'echo "coucou coucou"'
+echo 'exit'
+[931-END]
+
+[932]
+NAME="42sh Test 02 (Inhibitor "" with && inside)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'echo "ls && ls"'
+echo 'exit'
+[932-END]
+
+[933]
+NAME="42sh Test 05 (Inhibitor '' and "" and variable with && inside and outside)"
+SETUP="export TERM=xterm ; PATH='/bin:/usr/bin'"
+CLEAN=""
+TESTS=
+echo 'ls && ls && echo 'ls && ls' && echo "ls && ls" && echo '$a''
+echo 'exit'
+[933-END]
